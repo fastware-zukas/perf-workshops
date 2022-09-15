@@ -107,8 +107,7 @@ BENCH(michael_sring_to_int);
 static int jlane71_str_to_int(const char *str, int length) {
   int output = 0;
   bool negative = false;
-
-  if (*str == '-') {
+  int length = if (*str == '-') {
     negative = true;
     ++str;
     --length;
@@ -230,7 +229,7 @@ BENCHMARK_DEFINE_F(string_data_fixture, tej_sring_to_int)
   }
 }
 
-BENCH(tej_sring_to_int);
+// BENCH(tej_sring_to_int);
 
 int jz_sring_to_int(const char *str) {
   if (str == nullptr)
@@ -267,5 +266,32 @@ BENCHMARK_DEFINE_F(string_data_fixture, jz_sring_to_int)
 }
 
 BENCH(jz_sring_to_int);
+
+static int mani_str_to_int(const char *str) {
+  // atoi without whitespace checks
+  int num = 0;
+  bool isNeg = false;
+  if (*str == '-') {
+    isNeg = true;
+    ++str;
+  }
+  while (*str) {
+    num = (num * 10) + (*str++ - '0');
+  }
+  return isNeg ? -num : num;
+}
+
+BENCHMARK_DEFINE_F(string_data_fixture, mani_string_to_int)
+(benchmark::State &state) {
+  for (auto _ : state) {
+    for (const auto &[str, integer] : values) {
+      const auto val = mani_str_to_int(str.c_str());
+      assert(val == integer);
+      benchmark::DoNotOptimize(&val);
+    }
+  }
+}
+
+BENCH(mani_string_to_int);
 
 BENCHMARK_MAIN();
